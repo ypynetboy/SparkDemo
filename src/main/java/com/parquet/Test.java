@@ -24,7 +24,7 @@ public class Test {
                 .getOrCreate();
         Encoder<Record> recordEncoder = Encoders.bean(Record.class);
 
-        spark.read().textFile("D:\\data.json")
+        spark.read().textFile("/highway/demodata/parquet/data.json")
                 .mapPartitions(new MapPartitionsFunction<String, Record>() {
                     @Override
                     public Iterator<Record> call(Iterator<String> iterator) throws Exception {
