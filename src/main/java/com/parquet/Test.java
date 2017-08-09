@@ -10,6 +10,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -27,24 +28,22 @@ public class Test {
         Encoder<Record> recordEncoder = Encoders.bean(Record.class);
 
         spark.read().textFile("/highway/demodata/parquet/data.json")
+//        spark.read().textFile("D:\\data.json")
                 .mapPartitions(new MapPartitionsFunction<String, Record>() {
                     @Override
                     public Iterator<Record> call(Iterator<String> iterator) throws Exception {
                         ArrayList<Record> result = new ArrayList<>();
                         while (iterator.hasNext()) {
-                            result.add(new Record(iterator.next()));
+                            try {
+                                result.add(new Record(iterator.next()));
+                            } catch (ParseException|ArrayIndexOutOfBoundsException e) {
+                            }
                         }
                         return result.iterator();
                     }
                 }, recordEncoder)
-                .foreach(new ForeachFunction<Record>() {
-                    @Override
-                    public void call(Record record) throws Exception {
-                        System.out.println(String.format("%s, %d", record.getPhone(), record.getLastTime()));
-                    }
-                });
-//                .write()
-//                .mode(SaveMode.Overwrite)
-//                .parquet("/highway/demodata/parquet/abc.parquet");
+                .write()
+                .mode(SaveMode.Overwrite)
+                .parquet("/highway/demodata/parquet/abc.parquet");
     }
 }
