@@ -17,7 +17,7 @@ import java.util.Iterator;
 /**
  * Created by yangpy on 2017/8/7.
  */
-public class Test {
+public class Text2Parquet {
     public static void main(String[] args) {
         SparkSession spark = SparkSession
                 .builder()

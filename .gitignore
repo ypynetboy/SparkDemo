@@ -2,6 +2,9 @@
 .idea
 *.iml
 
+# Maven package file
+target/
+
 # Compiled class file
 *.class
 
