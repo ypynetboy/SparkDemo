@@ -19,7 +19,7 @@ public class Test {
         SparkSession spark = SparkSession
                 .builder()
                 .appName("Java Spark SQL basic example")
-                .config("spark.some.config.option", "some-value")
+                //.config("spark.some.config.option", "some-value")
                 .master("local[4]")
                 .getOrCreate();
         Encoder<Record> recordEncoder = Encoders.bean(Record.class);
@@ -33,6 +33,6 @@ public class Test {
                 }, recordEncoder)
                 .write()
                 .mode(SaveMode.Overwrite)
-                .parquet("abc.parquet");
+                .parquet("/highway/demodata/parquet/abc.parquet");
     }
 }
