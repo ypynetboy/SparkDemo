@@ -3,6 +3,7 @@ package com.parquet;
 import com.richstonedt.nokia_api.peopleflow.Record;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapPartitionsFunction;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
@@ -31,8 +32,14 @@ public class Test {
                         return null;
                     }
                 }, recordEncoder)
-                .write()
-                .mode(SaveMode.Overwrite)
-                .parquet("/highway/demodata/parquet/abc.parquet");
+                .foreach(new ForeachFunction<Record>() {
+                    @Override
+                    public void call(Record record) throws Exception {
+                        System.out.println(String.format("%s, %d", record.getPhone(), record.getLastTime()));
+                    }
+                });
+//                .write()
+//                .mode(SaveMode.Overwrite)
+//                .parquet("/highway/demodata/parquet/abc.parquet");
     }
 }
