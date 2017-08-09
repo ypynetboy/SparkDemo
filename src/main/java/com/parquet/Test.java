@@ -10,6 +10,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -29,7 +30,11 @@ public class Test {
                 .mapPartitions(new MapPartitionsFunction<String, Record>() {
                     @Override
                     public Iterator<Record> call(Iterator<String> iterator) throws Exception {
-                        return null;
+                        ArrayList<Record> result = new ArrayList<>();
+                        while (iterator.hasNext()) {
+                            result.add(new Record(iterator.next()));
+                        }
+                        return result.iterator();
                     }
                 }, recordEncoder)
                 .foreach(new ForeachFunction<Record>() {
