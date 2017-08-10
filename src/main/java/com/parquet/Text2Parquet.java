@@ -23,7 +23,7 @@ public class Text2Parquet {
                 .builder()
                 .appName("Java Spark SQL basic example")
                 //.config("spark.some.config.option", "some-value")
-                .master("local[4]")
+//                .master("local[4]")
                 .getOrCreate();
         Encoder<Record> recordEncoder = Encoders.bean(Record.class);
 
