@@ -3,13 +3,9 @@ package com.parquet;
 import com.richstonedt.nokia_api.peopleflow.Record;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.function.ForeachFunction;
-import org.apache.spark.api.java.function.MapPartitionsFunction;
-import org.apache.spark.sql.Encoder;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
-
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +39,8 @@ public class Text2Parquet {
                     }
                 }, recordEncoder)
                 .write()
+                .partitionBy("cgi")
                 .mode(SaveMode.Overwrite)
-                .parquet("/highway/demodata/parquet/abc.parquet");
+                .parquet("/highway/demodata/parquet/data.parquet");
     }
 }

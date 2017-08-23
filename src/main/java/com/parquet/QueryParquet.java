@@ -27,21 +27,30 @@ public class QueryParquet {
         SparkSession spark = SparkSession
                 .builder()
                 .appName("Java Spark SQL basic example")
-//                .master("local[4]")
+                .master("local[4]")
                 .getOrCreate();
-        Encoder<Record> recordEncoder = Encoders.bean(Record.class);
 
-        spark.read().parquet("hdfs:///highway/demodata/parquet/abc.parquet")
+        ArrayList<CGI> cigs = new ArrayList<>();
+//        cigs.add(new CGI("172540-3"));
+        cigs.add(new CGI("681071-1"));
+        Dataset<CGI> cgiDataset = spark.createDataset(cigs, Encoders.bean(CGI.class));
+        cgiDataset.createOrReplaceTempView("highway_cgis");
+
+//        spark.read().parquet("hdfs://192.168.6.25:9000/highway/demodata/parquet/abc.parquet")
+        spark.read().parquet("d:/tmp/abc.parquet")
                 .createOrReplaceTempView("record");
         clientShow(spark);
-        clusterShow(spark);
+        //clusterShow(spark);
     }
 
     private static void clientShow(SparkSession spark) {
-        List<Row> list = spark.sql("select * from record where lastTime > 1000")
+//        List<Row> list = spark.sql("select * from highway_cgis")
+//                .collectAsList();
+        List<Row> list = spark.sql("select * from record r, highway_cgis where r.cgi=highway_cgis.cgi")
                 .collectAsList();
         for (Row row : list) {
             System.out.println(String.format("%s, %d", row.getString(2), row.getLong(1)));
+//            System.out.println(String.format("%s", row.getString(0)));
         }
     }
 
@@ -58,12 +67,27 @@ public class QueryParquet {
                             while (iterator.hasNext()) {
                                 Row row = iterator.next();
                                 osLog.write(String.format("%s, %d\n", row.getString(2), row.getLong(1)).getBytes());
-                                System.out.println();
                             }
                         } finally {
                             osLog.close();
                         }
                     }
                 });
+    }
+
+    public static class CGI {
+        private String cgi;
+
+        public CGI(String cgi) {
+            this.cgi = cgi;
+        }
+
+        public void setCgi(String cgi) {
+            this.cgi = cgi;
+        }
+
+        public String getCgi() {
+            return cgi;
+        }
     }
 }
