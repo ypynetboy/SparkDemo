@@ -3,6 +3,10 @@ package com.parquet;
 import com.richstonedt.nokia_api.peopleflow.Record;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SaveMode;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -15,29 +19,24 @@ import java.util.Iterator;
  */
 public class Text2Parquet {
     public static void main(String[] args) {
-        SparkSession spark = SparkSession
-                .builder()
-                .appName("Java Spark SQL basic example")
-                //.config("spark.some.config.option", "some-value")
-//                .master("local[4]")
-                .getOrCreate();
-        Encoder<Record> recordEncoder = Encoders.bean(Record.class);
+        SparkConf sparkConf = new SparkConf().setAppName("Highway20MinStatistics").setMaster("local[12]");
+        JavaSparkContext javaSparkContext = new JavaSparkContext(sparkConf);
+        SQLContext sqlContext = new SQLContext(javaSparkContext);
 
-        spark.read().textFile("/highway/demodata/parquet/data.json")
-//        spark.read().textFile("D:\\data.json")
-                .mapPartitions(new MapPartitionsFunction<String, Record>() {
-                    @Override
-                    public Iterator<Record> call(Iterator<String> iterator) throws Exception {
-                        ArrayList<Record> result = new ArrayList<>();
-                        while (iterator.hasNext()) {
-                            try {
-                                result.add(new Record(iterator.next()));
-                            } catch (ParseException|ArrayIndexOutOfBoundsException e) {
-                            }
-                        }
-                        return result.iterator();
+        JavaRDD<Record> recordJavaRDD = javaSparkContext.textFile("/highway/demodata/parquet/data.json").mapPartitions(new FlatMapFunction<Iterator<String>, Record>() {
+            @Override
+            public Iterable<Record> call(Iterator<String> iterator) throws Exception {
+                ArrayList<Record> result = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    try {
+                        result.add(new Record(iterator.next()));
+                    } catch (ParseException | ArrayIndexOutOfBoundsException e) {
                     }
-                }, recordEncoder)
+                }
+                return result;
+            }
+        });
+        sqlContext.createDataFrame(recordJavaRDD, Record.class)
                 .write()
                 .partitionBy("cgi")
                 .mode(SaveMode.Overwrite)
