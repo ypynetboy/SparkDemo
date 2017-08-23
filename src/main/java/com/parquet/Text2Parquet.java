@@ -39,7 +39,7 @@ public class Text2Parquet {
         sqlContext.createDataFrame(recordJavaRDD, Record.class)
                 .write()
                 .partitionBy("cgi")
-                .mode(SaveMode.Overwrite)
+                .mode(SaveMode.Append)
                 .parquet("/highway/demodata/parquet/data.parquet");
     }
 }

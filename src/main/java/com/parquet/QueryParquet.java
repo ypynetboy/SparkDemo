@@ -39,9 +39,18 @@ public class QueryParquet {
 
         sqlContext.read().parquet("hdfs://192.168.6.25:9000/highway/demodata/parquet/data.parquet")
                 .registerTempTable("record");
+
+        filterData(sqlContext);
 //        sqlContext.read().parquet("d:/tmp/abc.parquet").registerTempTable("record");
-        clientShow(sqlContext);
+//        clientShow(sqlContext);
         //clusterShow(spark);
+    }
+
+    private static void filterData(SQLContext sqlContext) {
+        sqlContext.sql("select * from record r, highway_cgis where r.cgi=highway_cgis.cgi")
+                .write()
+                .mode(SaveMode.Append)
+                .parquet("/highway/demodata/parquet/681071-1.parquet");
     }
 
     private static void clientShow(SQLContext sqlContext) {
