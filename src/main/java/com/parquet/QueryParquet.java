@@ -14,6 +14,7 @@ import scala.runtime.BoxedUnit;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class QueryParquet {
         List<Row> list = sqlContext.sql("select * from record r, highway_cgis where r.cgi=highway_cgis.cgi")
                 .collectAsList();
         for (Row row : list) {
-            System.out.println(String.format("%s, %d", row.getString(2), row.getLong(1)));
+            System.out.println(String.format("%s, %d", row.getString(row.fieldIndex("phone")), row.getLong(row.fieldIndex("lastTime"))));
 //            System.out.println(String.format("%s", row.getString(0)));
         }
     }
@@ -79,7 +80,7 @@ public class QueryParquet {
                 });
     }
 
-    public static class CGI {
+    public static class CGI implements Serializable {
         private String cgi;
 
         public CGI(String cgi) {
