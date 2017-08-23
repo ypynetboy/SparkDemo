@@ -47,7 +47,7 @@ public class QueryParquet {
     }
 
     private static void filterData(SQLContext sqlContext) {
-        sqlContext.sql("select * from record r, highway_cgis where r.cgi=highway_cgis.cgi")
+        sqlContext.sql("select r.* from record r, highway_cgis where r.cgi=highway_cgis.cgi")
                 .write()
                 .mode(SaveMode.Append)
                 .parquet("/highway/demodata/parquet/681071-1.parquet");
@@ -56,7 +56,7 @@ public class QueryParquet {
     private static void clientShow(SQLContext sqlContext) {
 //        List<Row> list = spark.sql("select * from highway_cgis")
 //                .collectAsList();
-        List<Row> list = sqlContext.sql("select * from record r, highway_cgis where r.cgi=highway_cgis.cgi")
+        List<Row> list = sqlContext.sql("select r.* from record r, highway_cgis where r.cgi=highway_cgis.cgi")
                 .collectAsList();
         for (Row row : list) {
             System.out.println(String.format("%s, %d", row.getString(row.fieldIndex("phone")), row.getLong(row.fieldIndex("lastTime"))));
