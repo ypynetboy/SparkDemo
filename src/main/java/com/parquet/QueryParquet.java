@@ -36,8 +36,9 @@ public class QueryParquet {
         sqlContext.createDataFrame(javaSparkContext.parallelize(cgis), CGI.class)
                 .registerTempTable("highway_cgis");
 
-//        spark.read().parquet("hdfs://192.168.6.25:9000/highway/demodata/parquet/abc.parquet")
-        sqlContext.read().parquet("d:/tmp/abc.parquet").registerTempTable("record");
+        sqlContext.read().parquet("hdfs://192.168.6.25:9000/highway/demodata/parquet/data.parquet")
+                .registerTempTable("record");
+//        sqlContext.read().parquet("d:/tmp/abc.parquet").registerTempTable("record");
         clientShow(sqlContext);
         //clusterShow(spark);
     }
